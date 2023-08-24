@@ -1,0 +1,1 @@
+# okinawago_dictionary_pwa
