@@ -27,7 +27,7 @@ const Search = ({ handleInput, searchTerm }: searchItems) => (
       placeholder="かなで入力"
     ></IonSearchbar>
     <p>
-      Searching for <strong>{searchTerm}</strong>.
+      検索ワード &quot;<strong>{searchTerm}</strong>&quot; での検索結果。
     </p>
   </>
 );

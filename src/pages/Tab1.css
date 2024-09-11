@@ -1,0 +1,24 @@
+:root {
+    --wine-red: #4d201a;
+    --gold: #c2ba47;
+    --moegi: #98a820;
+    --silver: gray;
+    --seiheki: #488484;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500&display=swap');
+
+body {
+    font-family: "Noto Serif", "Noto Serif JP", serif;
+    font-weight: 500;
+}
+
+ion-title {
+    background-color: var(--wine-red);
+    color: var(--gold);
+    margin: 0px;
+    text-align-last: center;
+    font-family: "Noto Serif", "Noto Serif JP", serif;
+    font-weight: 500;
+
+}
