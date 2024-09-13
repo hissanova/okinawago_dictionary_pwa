@@ -1,10 +1,11 @@
 import React from 'react';
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonInput, IonSearchbar, IonItem, IonLabel, IonList } from '@ionic/react';
+import { IonInput, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonSearchbar, IonItem, IonLabel, IonList } from '@ionic/react';
 import { IonAccordion, IonAccordionGroup } from '@ionic/react';
 import './Tab1.css';
 const reactStringReplace = require('react-string-replace');
+const indexToIDDict = Object.entries(require('../static/okinawa_01_index-table.json')).map((d: any) => (d[1].map((e: any) => [d[0], e]))).flat();
 const okiDict = require('../static/okinawa_01.json');
-const indexToIDDict = okiDict.map((entry: any) => (entry['index'].map((index: string) => [index, entry['id']]))).flat();
+// const indexToIDDict = okiDict.map((entry: any) => (entry['index'].map((index: string) => [index, entry['id']]))).flat();
 
 const useStorageState = (key: string, initialState: string): [string, React.Dispatch<React.SetStateAction<string>>] => {
   const [value, setValue] = React.useState(
@@ -71,7 +72,7 @@ const Tab1: React.FC = () => {
         <Search handleInput={handleInput} searchTerm={searchTerm} />
         <Message len={results.length}></Message>
         <IonList>
-          {results.map((result: string, objectID: number) =>
+          {results.map((result: [string, any], objectID: number) =>
           (
             <IonAccordionGroup key={objectID}>
               <IonAccordion >
@@ -83,10 +84,15 @@ const Tab1: React.FC = () => {
                   </IonLabel>
                 </IonItem>
                 <div className="ion-padding" slot="content">
-                  ID: {result[1]} <br />
-                  発音: {okiDict[result[1]].pronunciation} <br />
-                  品詞: {okiDict[result[1]].pos.type} <br />
-                  意味: {okiDict[result[1]].meaning} <br />
+                  {JSON.stringify(result)} <br />
+                  {JSON.stringify(Object.keys(okiDict[result[1]]))} <br />
+                  ID: {result[1]}
+                  <h4>発音</h4>
+                  {JSON.stringify(okiDict[result[1]].phonetics)}
+                  <h4>品詞</h4>
+                  {JSON.stringify(okiDict[result[1]].pos)}
+                  <h4>意味</h4>
+                  {JSON.stringify(okiDict[result[1]].meaning)} <br />
                 </div>
               </IonAccordion>
             </IonAccordionGroup>
