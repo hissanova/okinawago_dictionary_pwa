@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">okinawago_dictionary_pwa</string>
+    <string name="title_activity_main">okinawago_dictionary_pwa</string>
+    <string name="package_name">com.okinawago.app</string>
+    <string name="custom_url_scheme">com.okinawago.app</string>
+</resources>

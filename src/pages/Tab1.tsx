@@ -41,7 +41,75 @@ const Message = ({ len }: resultsLen) => {
     return <p>{len} 件の見出し語がヒットしました。</p>;
 }
 
-const Tab1: React.FC = () => {
+const Definition = ({ okiDictEntry }: any) => (
+  <>
+    <div className="ion-padding" slot="content">
+      {JSON.stringify(Object.keys(okiDictEntry))} <br />
+      ID: {okiDictEntry.id}
+      <h4>発音</h4>
+      {/* {JSON.stringify(okiDictEntry.phonetics)} */}
+      <PronunciationTable phonetics_obj={okiDictEntry.phonetics} accent={okiDictEntry.accent} />
+      <h4>品詞</h4>
+      {JSON.stringify(okiDictEntry.pos)}
+      <p>[{okiDictEntry.pos.type}]</p>
+      <h4>意味</h4>
+      {JSON.stringify(okiDictEntry.meaning)} <br />
+      {okiDictEntry.pos.conjugation ?
+        (<ConjugationTable conjugation={okiDictEntry.pos.conjugation} />) :
+        ("")
+      }
+    </div>
+  </>
+);
+
+const PronunciationTable = ({ phonetics_obj, accent }: any) => (
+  <>
+    <table >
+      <tbody>
+        <tr>
+          <th >音素</th>
+          <td >
+            {phonetics_obj.phonemes.original}
+            ({phonetics_obj.phonemes.original != phonetics_obj.phonemes.simplified ?
+              (phonetics_obj.phonemes.simplified) : ("")
+            })
+          </td>
+        </tr>
+        <tr>
+          <th >カナ</th>
+          <td >
+            {phonetics_obj.pronunciation.HEIMIN.kana}
+            {phonetics_obj.pronunciation.SHIZOKU ?
+              ", (士) " + (phonetics_obj.pronunciation.SHIZOKU.kana[0]) : ("")
+            }
+          </td>
+        </tr>
+        <tr>
+          <th >IPA</th>
+          <td >
+            〔{phonetics_obj.pronunciation.HEIMIN.IPA}〕
+            {phonetics_obj.pronunciation.SHIZOKU ?
+              ", (士) 〔" + (phonetics_obj.pronunciation.SHIZOKU.IPA) + "〕" : ("")
+            }
+          </td>
+        </tr>
+        <tr>
+          <th >アクセント</th>
+          <td >{accent}</td>
+        </tr>
+
+      </tbody>
+    </table>
+  </>
+);
+
+const ConjugationTable = ({ conjugation }: any) => (
+  <>
+    <h4>活用</h4>
+  </>
+);
+
+function Tab1() {
   const [searchTerm, setResults] = useStorageState('search', '');
 
   const handleInput = (ev: Event): void => {
@@ -72,10 +140,9 @@ const Tab1: React.FC = () => {
         <Search handleInput={handleInput} searchTerm={searchTerm} />
         <Message len={results.length}></Message>
         <IonList>
-          {results.map((result: [string, any], objectID: number) =>
-          (
+          {results.map((result: [string, any], objectID: number) => (
             <IonAccordionGroup key={objectID}>
-              <IonAccordion >
+              <IonAccordion>
                 <IonItem slot="header" color="light">
                   <IonLabel>
                     {reactStringReplace(result[0], searchTerm, (match: string, i: number) => (
@@ -83,17 +150,8 @@ const Tab1: React.FC = () => {
                     ))}
                   </IonLabel>
                 </IonItem>
-                <div className="ion-padding" slot="content">
-                  {JSON.stringify(result)} <br />
-                  {JSON.stringify(Object.keys(okiDict[result[1]]))} <br />
-                  ID: {result[1]}
-                  <h4>発音</h4>
-                  {JSON.stringify(okiDict[result[1]].phonetics)}
-                  <h4>品詞</h4>
-                  {JSON.stringify(okiDict[result[1]].pos)}
-                  <h4>意味</h4>
-                  {JSON.stringify(okiDict[result[1]].meaning)} <br />
-                </div>
+                {JSON.stringify(result)} <br />
+                <Definition okiDictEntry={okiDict[result[1]]} />
               </IonAccordion>
             </IonAccordionGroup>
           )
@@ -102,6 +160,6 @@ const Tab1: React.FC = () => {
       </IonContent>
     </IonPage>
   );
-};
+}
 
 export default Tab1;

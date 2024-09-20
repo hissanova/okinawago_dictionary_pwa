@@ -253,3 +253,24 @@ http://ionicframework.com/docs/theming/ */
     --ion-card-background: #ffffff;
   }
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500&display=swap');
+
+* {
+  font-family: "Noto Serif", "Noto Serif JP", serif;
+  font-weight: 500;
+}
+
+table,
+th,
+td {
+  margin-left: 15px;
+  padding: 5px;
+  border: 1.7px solid var(--silver);
+
+}
+
+th {
+  background-color: var(--pale-yellow);
+  font-weight: 550;
+}
