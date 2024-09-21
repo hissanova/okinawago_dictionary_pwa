@@ -41,7 +41,7 @@ const Message = ({ len }: resultsLen) => {
     return <p>{len} 件の見出し語がヒットしました。</p>;
 }
 
-const Definition = ({ okiDictEntry }: any) => (
+const RenderEntry = ({ okiDictEntry }: any) => (
   <>
     <div className="ion-padding" slot="content">
       {JSON.stringify(Object.keys(okiDictEntry))} <br />
@@ -50,15 +50,75 @@ const Definition = ({ okiDictEntry }: any) => (
       {/* {JSON.stringify(okiDictEntry.phonetics)} */}
       <PronunciationTable phonetics_obj={okiDictEntry.phonetics} accent={okiDictEntry.accent} />
       <h4>品詞</h4>
-      {JSON.stringify(okiDictEntry.pos)}
+      {/* {JSON.stringify(okiDictEntry.pos)} */}
       <p>[{okiDictEntry.pos.type}]</p>
       <h4>意味</h4>
-      {JSON.stringify(okiDictEntry.meaning)} <br />
-      {okiDictEntry.pos.conjugation ?
-        (<ConjugationTable conjugation={okiDictEntry.pos.conjugation} />) :
-        ("")
-      }
+      {/* {JSON.stringify(okiDictEntry.meaning)} <br /> */}
+      <Meaning meanings={okiDictEntry.meaning} />
+      {okiDictEntry.pos.conjugation &&
+        (<ConjugationTable conjugation={okiDictEntry.pos.conjugation} />)}
     </div>
+  </>
+);
+
+const replaceString = (paragraph: string, phonetics: any) => {
+  const target_oki = phonetics.phonemes.simplified
+  const pronunciation = phonetics.pronunciation
+  const heimin_kana = pronunciation.HEIMIN.kana[0]
+  const heimin_ipa = pronunciation.HEIMIN.IPA
+  let replacement = <><i>{heimin_kana}</i> 〔{heimin_ipa}〕</>;
+  if (pronunciation.SHIZOKU) {
+    const shizoku_pro = pronunciation.SHIZOKU
+    replacement = <>{replacement} (士:<i>{shizoku_pro.kana[0]}</i>〔 {shizoku_pro.IPA} 〕)</>;
+  }
+  return reactStringReplace(paragraph, target_oki, (match: string, i: number) => (
+    replacement)
+  );
+};
+
+const RenderOkinawagoSentence = ({ okiEntry }: any) => (
+  <>
+    <p>
+      {/* {JSON.stringify(okiEntry)} */}
+      <i>{okiEntry.pronunciation.HEIMIN.kana[0]}</i>
+      {okiEntry.pronunciation.SHIZOKU &&
+        <>士: <i> {okiEntry.pronunciation.SHIZOKU.kana[0]} </i></>}
+      <br />
+      〔{okiEntry.pronunciation.HEIMIN.IPA}
+      {okiEntry.pronunciation.SHIZOKU ?
+        <span>士: {okiEntry.pronunciation.SHIZOKU.IPA}</span> : <></>
+      }
+      〕
+    </p>
+  </>
+);
+
+const Meaning = ({ meanings }: any) => (
+  <>
+    <IonList>
+      {meanings.map((meaning: any, objectID: number) =>
+        <IonItem key={objectID}>
+          <IonList>
+            {meaning && meaning.map((paragraph: any, objectID: number) =>
+            (< >
+              <p key={objectID}>
+                {/* Line{objectID}: <br /> */}
+                {paragraph.yamato ?
+                  // JSON.stringify(paragraph.yamato) + JSON.stringify(paragraph.okinawago)
+                  (paragraph.okinawago ?
+                    paragraph.okinawago.reduce((acc: string, currVal: any) => (replaceString(acc, currVal)), paragraph.yamato) :
+                    paragraph.yamato) :
+                  <RenderOkinawagoSentence okiEntry={paragraph.okinawago}></RenderOkinawagoSentence>
+                }
+              </p>
+            </>
+            ))
+            }
+          </IonList>
+        </IonItem>
+      )}
+
+    </IonList>
   </>
 );
 
@@ -151,7 +211,7 @@ function Tab1() {
                   </IonLabel>
                 </IonItem>
                 {JSON.stringify(result)} <br />
-                <Definition okiDictEntry={okiDict[result[1]]} />
+                <RenderEntry okiDictEntry={okiDict[result[1]]} />
               </IonAccordion>
             </IonAccordionGroup>
           )
