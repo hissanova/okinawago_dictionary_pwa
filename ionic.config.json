@@ -1,5 +1,7 @@
 {
   "name": "okinawago_dictionary_pwa",
-  "integrations": {},
+  "integrations": {
+    "capacitor": {}
+  },
   "type": "react"
 }
