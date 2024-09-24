@@ -1,6 +1,8 @@
 import React from 'react';
-import { IonInput, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonSearchbar, IonItem, IonLabel, IonList } from '@ionic/react';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonSearchbar, IonItem, IonLabel, IonList } from '@ionic/react';
+// import { IonInput } from '@ionic/react';
 import { IonAccordion, IonAccordionGroup } from '@ionic/react';
+import { v4 as uuidv4 } from 'uuid';
 import './Tab1.css';
 const reactStringReplace = require('react-string-replace');
 const indexToIDDict = Object.entries(require('../static/okinawa_01_index-table.json')).map((d: any) => (d[1].map((e: any) => [d[0], e]))).flat();
@@ -53,7 +55,7 @@ const RenderEntry = ({ okiDictEntry }: any) => (
       {/* {JSON.stringify(okiDictEntry.pos)} */}
       <p>[{okiDictEntry.pos.type}]</p>
       <h4>意味</h4>
-      {/* {JSON.stringify(okiDictEntry.meaning)} <br /> */}
+      {JSON.stringify(okiDictEntry.meaning)} <br />
       <Meaning meanings={okiDictEntry.meaning} />
       {okiDictEntry.pos.conjugation &&
         (<ConjugationTable conjugation={okiDictEntry.pos.conjugation} />)}
@@ -71,38 +73,42 @@ const replaceString = (paragraph: string, phonetics: any) => {
     const shizoku_pro = pronunciation.SHIZOKU
     replacement = <>{replacement} (士:<i>{shizoku_pro.kana[0]}</i>〔 {shizoku_pro.IPA} 〕)</>;
   }
-  return reactStringReplace(paragraph, target_oki, (match: string, i: number) => (
+  return reactStringReplace(paragraph, target_oki, () => (
     replacement)
+    // return reactStringReplace(paragraph, target_oki, (match: string, i: number) => (
+    //   replacement)
   );
 };
 
 const RenderOkinawagoSentence = ({ okiEntry }: any) => (
   <>
-    <p>
-      {/* {JSON.stringify(okiEntry)} */}
-      <i>{okiEntry.pronunciation.HEIMIN.kana[0]}</i>
-      {okiEntry.pronunciation.SHIZOKU &&
-        <>士: <i> {okiEntry.pronunciation.SHIZOKU.kana[0]} </i></>}
-      <br />
-      〔{okiEntry.pronunciation.HEIMIN.IPA}
-      {okiEntry.pronunciation.SHIZOKU ?
-        <span>士: {okiEntry.pronunciation.SHIZOKU.IPA}</span> : <></>
-      }
-      〕
-    </p>
+
+    {/* {JSON.stringify(okiEntry)} */}
+    <i>{okiEntry.pronunciation.HEIMIN.kana[0]}</i>
+    {okiEntry.pronunciation.SHIZOKU &&
+      <>士: <i> {okiEntry.pronunciation.SHIZOKU.kana[0]} </i></>}
+    <br />
+    〔{okiEntry.pronunciation.HEIMIN.IPA}
+    {okiEntry.pronunciation.SHIZOKU ?
+      <span>士: {okiEntry.pronunciation.SHIZOKU.IPA}</span> : <></>
+    }
+    〕
   </>
 );
 
 const Meaning = ({ meanings }: any) => (
   <>
-    <IonList>
-      {meanings.map((meaning: any, objectID: number) =>
-        <IonItem key={objectID}>
-          <IonList>
-            {meaning && meaning.map((paragraph: any, objectID: number) =>
-            (< >
-              <p key={objectID}>
-                {/* Line{objectID}: <br /> */}
+    <IonList slot="content">
+      {meanings.map((meaning: any) =>
+        <div key={uuidv4(meaning)}>
+          {/* {Object.defineProperty(meaning, "hoge", { value: "hoge" })} */}
+          <IonList key={uuidv4(meaning)}>
+            {meaning && meaning.map((paragraph: any) =>
+            (
+              <p key={uuidv4(paragraph)}>
+                key1={uuidv4(meaning)}, key2={uuidv4(meaning)} key3={uuidv4(paragraph)} <br />
+                {uuidv4(meaning.yamato) == uuidv4(meaning) ? console.log(uuidv4(meaning.yamato), uuidv4(meaning)) : ""}
+
                 {paragraph.yamato ?
                   // JSON.stringify(paragraph.yamato) + JSON.stringify(paragraph.okinawago)
                   (paragraph.okinawago ?
@@ -111,11 +117,10 @@ const Meaning = ({ meanings }: any) => (
                   <RenderOkinawagoSentence okiEntry={paragraph.okinawago}></RenderOkinawagoSentence>
                 }
               </p>
-            </>
             ))
             }
           </IonList>
-        </IonItem>
+        </div>
       )}
 
     </IonList>
@@ -166,9 +171,29 @@ const PronunciationTable = ({ phonetics_obj, accent }: any) => (
 const ConjugationTable = ({ conjugation }: any) => (
   <>
     <h4>活用</h4>
+    {JSON.stringify(conjugation)}
   </>
 );
 
+const AccordionHeader = ({ id, result, searchTerm }: any) => (
+  <IonItem key={id} slot="header" color="light"  >
+    <IonLabel>
+      {reactStringReplace(result[0], searchTerm, (match: string) => (
+        <b>{match}</b>
+      ))} ID:{uuidv4(result[1])}, key:{`${id}-1`}
+    </IonLabel>
+  </IonItem>
+)
+const WordAccordion = ({ id, result, searchTerm }: any) => (
+  // <IonAccordionGroup >
+  <IonAccordion value={`${id}-0`}>
+    <AccordionHeader key={`${id}-header`} result={result} searchTerm={searchTerm} id={id} />
+
+    {JSON.stringify(result)} <br />
+    {/* <RenderEntry key={`${id}-${uuidv4(result[1])}`} okiDictEntry={okiDict[result[1]]} /> */}
+  </IonAccordion>
+  // </IonAccordionGroup>
+)
 function Tab1() {
   const [searchTerm, setResults] = useStorageState('search', '');
 
@@ -199,24 +224,28 @@ function Tab1() {
         </IonHeader>
         <Search handleInput={handleInput} searchTerm={searchTerm} />
         <Message len={results.length}></Message>
-        <IonList>
-          {results.map((result: [string, any], objectID: number) => (
-            <IonAccordionGroup key={objectID}>
-              <IonAccordion>
-                <IonItem slot="header" color="light">
+        {/* <IonList> */}
+        <IonAccordionGroup >
+          {results.map((result: [string, any], objectID: number) => {
+            const id = uuidv4(result[1]);
+            return (
+              // <WordAccordion key={objectID} result={result} searchTerm={searchTerm} id={id} />
+              <IonAccordion key={`accordion-${id}`} value={id}>
+                <IonItem key={`accordion-item-${id}`} slot="header" color="light">
                   <IonLabel>
-                    {reactStringReplace(result[0], searchTerm, (match: string, i: number) => (
+                    {reactStringReplace(result[0], searchTerm, (match: string) => (
                       <b>{match}</b>
-                    ))}
+                    ))} ID:{uuidv4(result[1])}
                   </IonLabel>
                 </IonItem>
                 {JSON.stringify(result)} <br />
                 <RenderEntry okiDictEntry={okiDict[result[1]]} />
               </IonAccordion>
-            </IonAccordionGroup>
-          )
+            )
+          }
           )}
-        </IonList>
+          {/* </IonList> */}
+        </IonAccordionGroup>
       </IonContent>
     </IonPage>
   );
