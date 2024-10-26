@@ -10,7 +10,6 @@ const OkiDictEntry = lazy(() => import('./OkiDictEntry'));
 
 const reactStringReplace = require('react-string-replace');
 const indexToIDDict = Object.entries(require('../static/okinawa_01_index-table.json')).map((d: any) => (d[1].map((e: any) => [d[0], e]))).flat();
-const okiDict = require('../static/okinawa_01.json');
 
 const useStorageState = (key: string, initialState: string): [string, React.Dispatch<React.SetStateAction<string>>] => {
   const [value, setValue] = React.useState(
@@ -67,7 +66,7 @@ const SearchResults = ({ results, searchTerm }: any) => (
               </IonItem>
               <div className="ion-padding" slot="content">
                 <Suspense fallback={<div>Loading...</div>}>
-                  <OkiDictEntry okiDictEntry={okiDict[result[1]]} />
+                  <OkiDictEntry entryID={result[1]} />
                 </Suspense>
               </div>
             </IonAccordion>))

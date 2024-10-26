@@ -10,7 +10,8 @@ const reactStringReplace = require('react-string-replace');
 const indexToIDDict = Object.entries(require('../static/okinawa_01_index-table.json')).map((d: any) => (d[1].map((e: any) => [d[0], e]))).flat();
 const okiDict = require('../static/okinawa_01.json');
 // const indexToIDDict = okiDict.map((entry: any) => (entry['index'].map((index: string) => [index, entry['id']]))).flat();
-function OkiDictEntry({ okiDictEntry }: any): any {
+function OkiDictEntry({ entryID }: { entryID: number }): any {
+    const okiDictEntry = okiDict[entryID];
     return (
         <>
             <div className="ion-padding" slot="content">
